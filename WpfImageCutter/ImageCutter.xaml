@@ -1,0 +1,17 @@
+﻿<UserControl x:Name="MainControl" x:Class="WpfImageCutter.ImageCutter"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfImageCutter"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800" SizeChanged="MainControl_SizeChanged" Loaded="MainControl_Loaded" MouseLeftButtonUp="MainControl_MouseLeftButtonUp" MouseLeave="MainControl_MouseLeave">
+    <Grid x:Name="MainGrid" Background="#FF4B4B4B" MouseMove="MainGrid_MouseMove" MouseLeftButtonUp="MainGrid_MouseLeftButtonUp">
+        <Image x:Name="ControlImage"/>
+        <Border x:Name="PreviewRect" BorderThickness="2" BorderBrush="White" HorizontalAlignment="Left" Width="800" Height="450" VerticalAlignment="Top"/>
+        <Rectangle x:Name="TopHandler" Fill="Black" Height="2" Stroke="Black" VerticalAlignment="Top" Margin="389,0,0,0" HorizontalAlignment="Left" Width="20" MouseLeftButtonDown="GrabHandler" MouseLeftButtonUp="ReleaseHandler"/>
+        <Rectangle x:Name="BottomHandler" Fill="Black" Height="2" Stroke="Black" VerticalAlignment="Top" Margin="389,448,0,0" HorizontalAlignment="Left" Width="20" MouseLeftButtonDown="GrabHandler" MouseLeftButtonUp="ReleaseHandler"/>
+        <Rectangle x:Name="LeftHandler" Fill="Black" Height="20" Stroke="Black" VerticalAlignment="Top" Margin="0,225,0,0" HorizontalAlignment="Left" Width="2" MouseLeftButtonDown="GrabHandler" MouseLeftButtonUp="ReleaseHandler"/>
+        <Rectangle x:Name="RightHandler" Fill="Black" Height="20" Stroke="Black" VerticalAlignment="Top" Margin="798,225,0,0" HorizontalAlignment="Left" Width="2" MouseLeftButtonDown="GrabHandler" MouseLeftButtonUp="ReleaseHandler"/>
+    </Grid>
+</UserControl>
