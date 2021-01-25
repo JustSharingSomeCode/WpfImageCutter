@@ -25,17 +25,12 @@ namespace WpfImageCutter
             InitializeComponent();
         }
 
+        //Cutter bounds
         private double MinLeft, MinTop, MaxRight, MaxBottom;
-        private Rectangle ActiveHandler;
+        //Active handle
+        private Rectangle ActiveHandler;        
 
-        private void MainControl_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            UpdateBounds();
-            UpdateHandlersPosition();
-            UpdateTopBottomMiddlePosition();
-            UpdateLeftRightMiddlePosition();
-        }
-
+        #region SourceProperty
         public ImageSource Source
         {
             get
@@ -49,14 +44,13 @@ namespace WpfImageCutter
                     ControlImage.Source = value;
                     UpdateLayout();
                     UpdateBounds();
-                    UpdateHandlersPosition();
-                    //PreviewRect.Margin = new Thickness(MinLeft, MinTop, 0, 0);
-                    //PreviewRect.Width = MaxRight - MinLeft + LeftHandler.ActualWidth;
-                    //PreviewRect.Height = MaxBottom - MinTop + BottomHandler.ActualHeight;
+                    UpdateHandlersPosition();                   
                 }
             }
-        }        
+        }
+        #endregion
 
+        #region UpdateEvents
         private void UpdateBounds()
         {
             MinLeft = (ActualWidth - ControlImage.ActualWidth) / 2;
@@ -91,6 +85,15 @@ namespace WpfImageCutter
             RightHandler.Margin = new Thickness(RightHandler.Margin.Left, position, 0, 0);
         }
 
+        private void UpdatePreview()
+        {
+            PreviewRect.Margin = new Thickness(LeftHandler.Margin.Left, TopHandler.Margin.Top, 0, 0);
+            PreviewRect.Width = RightHandler.Margin.Left - LeftHandler.Margin.Left + RightHandler.ActualWidth;
+            PreviewRect.Height = BottomHandler.Margin.Top - TopHandler.Margin.Top + BottomHandler.ActualHeight;
+        }
+        #endregion
+
+        #region Grab/Release
         private void GrabHandler(object sender, MouseButtonEventArgs e)
         {
             ActiveHandler = (Rectangle)sender;
@@ -100,7 +103,9 @@ namespace WpfImageCutter
         {
             ActiveHandler = null;
         }
+        #endregion
 
+        #region HandleMovement
         private void MoveLeftHandler(double position)
         {
             LeftHandler.Margin = new Thickness(Clamp(position, MinLeft, RightHandler.Margin.Left), LeftHandler.Margin.Top, 0, 0);
@@ -113,10 +118,15 @@ namespace WpfImageCutter
             UpdateTopBottomMiddlePosition();
         }
 
-        private void MainControl_Loaded(object sender, RoutedEventArgs e)
+        private void MoveTopHandler(double position)
         {
-            UpdateBounds();
-            UpdateTopBottomMiddlePosition();
+            TopHandler.Margin = new Thickness(TopHandler.Margin.Left, Clamp(position, MinTop, BottomHandler.Margin.Top), 0, 0);
+            UpdateLeftRightMiddlePosition();
+        }
+
+        private void MoveBottomHandler(double position)
+        {
+            BottomHandler.Margin = new Thickness(BottomHandler.Margin.Left, Clamp(position, TopHandler.Margin.Top, MaxBottom), 0, 0);
             UpdateLeftRightMiddlePosition();
         }
 
@@ -142,12 +152,22 @@ namespace WpfImageCutter
                 UpdatePreview();
             }
         }
+        #endregion                       
 
-        private void UpdatePreview()
+        #region LocalEvents
+        private void MainControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            PreviewRect.Margin = new Thickness(LeftHandler.Margin.Left, TopHandler.Margin.Top, 0, 0);
-            PreviewRect.Width = RightHandler.Margin.Left - LeftHandler.Margin.Left + RightHandler.ActualWidth;
-            PreviewRect.Height = BottomHandler.Margin.Top - TopHandler.Margin.Top + BottomHandler.ActualHeight;
+            UpdateBounds();
+            UpdateHandlersPosition();
+            UpdateTopBottomMiddlePosition();
+            UpdateLeftRightMiddlePosition();
+        }
+
+        private void MainControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            UpdateBounds();
+            UpdateTopBottomMiddlePosition();
+            UpdateLeftRightMiddlePosition();
         }
 
         private void MainGrid_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -164,18 +184,7 @@ namespace WpfImageCutter
         {
             ActiveHandler = null;
         }
-
-        private void MoveTopHandler(double position)
-        {
-            TopHandler.Margin = new Thickness(TopHandler.Margin.Left, Clamp(position, MinTop, BottomHandler.Margin.Top), 0, 0);
-            UpdateLeftRightMiddlePosition();
-        }
-
-        private void MoveBottomHandler(double position)
-        {
-            BottomHandler.Margin = new Thickness(BottomHandler.Margin.Left, Clamp(position, TopHandler.Margin.Top, MaxBottom), 0, 0);
-            UpdateLeftRightMiddlePosition();
-        }
+        #endregion
 
         private double Clamp(double value, double min, double max)
         {

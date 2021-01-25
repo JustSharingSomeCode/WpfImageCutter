@@ -9,9 +9,9 @@
     <Grid x:Name="MainGrid" Background="#FF4B4B4B" MouseMove="MainGrid_MouseMove" MouseLeftButtonUp="MainGrid_MouseLeftButtonUp">
         <Image x:Name="ControlImage"/>
         <Border x:Name="PreviewRect" BorderThickness="2" BorderBrush="White" HorizontalAlignment="Left" Width="800" Height="450" VerticalAlignment="Top"/>
-        <Rectangle x:Name="TopHandler" Fill="Black" Height="2" Stroke="Black" VerticalAlignment="Top" Margin="389,0,0,0" HorizontalAlignment="Left" Width="20" MouseLeftButtonDown="GrabHandler" MouseLeftButtonUp="ReleaseHandler"/>
-        <Rectangle x:Name="BottomHandler" Fill="Black" Height="2" Stroke="Black" VerticalAlignment="Top" Margin="389,448,0,0" HorizontalAlignment="Left" Width="20" MouseLeftButtonDown="GrabHandler" MouseLeftButtonUp="ReleaseHandler"/>
-        <Rectangle x:Name="LeftHandler" Fill="Black" Height="20" Stroke="Black" VerticalAlignment="Top" Margin="0,225,0,0" HorizontalAlignment="Left" Width="2" MouseLeftButtonDown="GrabHandler" MouseLeftButtonUp="ReleaseHandler"/>
-        <Rectangle x:Name="RightHandler" Fill="Black" Height="20" Stroke="Black" VerticalAlignment="Top" Margin="798,225,0,0" HorizontalAlignment="Left" Width="2" MouseLeftButtonDown="GrabHandler" MouseLeftButtonUp="ReleaseHandler"/>
+        <Rectangle x:Name="TopHandler" Fill="Black" Height="2" Stroke="Black" VerticalAlignment="Top" Margin="389,0,0,0" HorizontalAlignment="Left" Width="20" MouseLeftButtonDown="GrabHandler" MouseLeftButtonUp="ReleaseHandler" Cursor="SizeNS"/>
+        <Rectangle x:Name="BottomHandler" Fill="Black" Height="2" Stroke="Black" VerticalAlignment="Top" Margin="389,448,0,0" HorizontalAlignment="Left" Width="20" MouseLeftButtonDown="GrabHandler" MouseLeftButtonUp="ReleaseHandler" Cursor="SizeNS"/>
+        <Rectangle x:Name="LeftHandler" Fill="Black" Height="20" Stroke="Black" VerticalAlignment="Top" Margin="0,225,0,0" HorizontalAlignment="Left" Width="2" MouseLeftButtonDown="GrabHandler" MouseLeftButtonUp="ReleaseHandler" Cursor="SizeWE"/>
+        <Rectangle x:Name="RightHandler" Fill="Black" Height="20" Stroke="Black" VerticalAlignment="Top" Margin="798,225,0,0" HorizontalAlignment="Left" Width="2" MouseLeftButtonDown="GrabHandler" MouseLeftButtonUp="ReleaseHandler" Cursor="SizeWE"/>
     </Grid>
 </UserControl>
