@@ -30,6 +30,7 @@ namespace WpfImageCutter
         private double MinLeft, MinTop, MaxRight, MaxBottom;
         //Active handle
         private Rectangle ActiveHandler;
+        private bool MoveAllHandlers = false;
 
         #region SourceProperty
         [Category("ImageCutter Properties")]
@@ -203,6 +204,23 @@ namespace WpfImageCutter
             UpdateLeftRightMiddlePosition();
         }
 
+        private void MoveHandlers(Point position)
+        {
+            double maxright, maxbottom;
+
+            maxright = Clamp(position.X - PreviewRect.ActualWidth / 2, MinLeft, MaxRight - PreviewRect.ActualWidth + RightHandler.ActualWidth);
+            maxbottom = Clamp(position.Y - PreviewRect.ActualHeight / 2, MinTop, MaxBottom - PreviewRect.ActualHeight + BottomHandler.ActualHeight);
+
+            PreviewRect.Margin = new Thickness(maxright, maxbottom, 0, 0);
+
+            MoveLeftHandler(PreviewRect.Margin.Left);
+            MoveTopHandler(PreviewRect.Margin.Top);
+            MoveRightHandler(PreviewRect.Margin.Left + PreviewRect.ActualWidth - RightHandler.ActualWidth);
+            MoveBottomHandler(PreviewRect.Margin.Top + PreviewRect.ActualHeight - BottomHandler.ActualHeight);
+
+            UpdatePreview();
+        }
+
         private void MainGrid_MouseMove(object sender, MouseEventArgs e)
         {
             if (ActiveHandler != null)
@@ -223,6 +241,10 @@ namespace WpfImageCutter
                         break;
                 }
                 UpdatePreview();
+            }
+            else if(MoveAllHandlers)
+            {                
+                MoveHandlers(e.GetPosition(MainGrid));
             }
         }
         #endregion                       
@@ -246,7 +268,7 @@ namespace WpfImageCutter
         private void MainGrid_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             ActiveHandler = null;
-        }
+        }        
 
         private void MainControl_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
@@ -257,7 +279,22 @@ namespace WpfImageCutter
         {
             ActiveHandler = null;
         }
-        #endregion        
+
+        private void PreviewRect_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            MoveAllHandlers = true;
+        }
+
+        private void PreviewRect_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            MoveAllHandlers = false;
+        }
+
+        private void PreviewRect_MouseLeave(object sender, MouseEventArgs e)
+        {
+            MoveAllHandlers = false;
+        }
+        #endregion                
 
         private double Clamp(double value, double min, double max)
         {
