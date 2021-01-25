@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,9 +29,10 @@ namespace WpfImageCutter
         //Cutter bounds
         private double MinLeft, MinTop, MaxRight, MaxBottom;
         //Active handle
-        private Rectangle ActiveHandler;        
+        private Rectangle ActiveHandler;
 
         #region SourceProperty
+        [Category("ImageCutter Properties")]
         public ImageSource Source
         {
             get
@@ -45,6 +47,57 @@ namespace WpfImageCutter
                     UpdateLayout();
                     UpdateBounds();
                     UpdateHandlersPosition();                   
+                }
+            }
+        }
+        #endregion
+
+        #region BorderSizeProperty
+        [Category("ImageCutter Properties")]
+        public int BorderSize
+        {
+            get
+            {
+                return (int)PreviewRect.BorderThickness.Left;
+            }
+            set
+            {
+                if(value >= 1)
+                {
+                    PreviewRect.BorderThickness = new Thickness(value);
+                    LeftHandler.Width = value;
+                    TopHandler.Height = value;
+                    RightHandler.Width = value;
+                    BottomHandler.Height = value;
+
+                    UpdateLayout();
+                    UpdateBounds();
+                    UpdateHandlersPosition();
+                }
+            }
+        }
+        #endregion
+
+        #region HandlerLenghtProperty
+        [Category("ImageCutter Properties")]
+        public double HandlerLenght
+        {
+            get
+            {
+                return LeftHandler.ActualHeight;
+            }
+            set
+            {
+                if(value>=1)
+                {
+                    LeftHandler.Height = value;
+                    RightHandler.Height = value;
+                    TopHandler.Width = value;
+                    BottomHandler.Width = value;
+
+                    UpdateLayout();
+                    UpdateLeftRightMiddlePosition();
+                    UpdateTopBottomMiddlePosition();
                 }
             }
         }
@@ -90,6 +143,26 @@ namespace WpfImageCutter
             PreviewRect.Margin = new Thickness(LeftHandler.Margin.Left, TopHandler.Margin.Top, 0, 0);
             PreviewRect.Width = RightHandler.Margin.Left - LeftHandler.Margin.Left + RightHandler.ActualWidth;
             PreviewRect.Height = BottomHandler.Margin.Top - TopHandler.Margin.Top + BottomHandler.ActualHeight;
+
+            UpdateBackgroundDim();
+        }
+
+        private void UpdateBackgroundDim()
+        {
+            BackgroundDim.Points.Clear();
+
+            BackgroundDim.Points.Add(new Point(MinLeft, MinTop));
+            BackgroundDim.Points.Add(new Point(MaxRight + RightHandler.ActualWidth, MinTop));
+            BackgroundDim.Points.Add(new Point(MaxRight + RightHandler.ActualWidth, MaxBottom + BottomHandler.ActualHeight));
+            BackgroundDim.Points.Add(new Point(MinLeft, MaxBottom + BottomHandler.ActualHeight));
+
+            BackgroundDim.Points.Add(new Point(LeftHandler.Margin.Left, BottomHandler.Margin.Top));
+            BackgroundDim.Points.Add(new Point(RightHandler.Margin.Left, BottomHandler.Margin.Top));
+            BackgroundDim.Points.Add(new Point(RightHandler.Margin.Left, TopHandler.Margin.Top));
+            BackgroundDim.Points.Add(new Point(LeftHandler.Margin.Left, TopHandler.Margin.Top));
+
+            BackgroundDim.Points.Add(new Point(LeftHandler.Margin.Left, BottomHandler.Margin.Top));
+            BackgroundDim.Points.Add(new Point(MinLeft, MaxBottom + BottomHandler.ActualHeight));
         }
         #endregion
 
@@ -184,7 +257,7 @@ namespace WpfImageCutter
         {
             ActiveHandler = null;
         }
-        #endregion
+        #endregion        
 
         private double Clamp(double value, double min, double max)
         {

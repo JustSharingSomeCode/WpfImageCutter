@@ -6,8 +6,9 @@
              xmlns:local="clr-namespace:WpfImageCutter"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" SizeChanged="MainControl_SizeChanged" Loaded="MainControl_Loaded" MouseLeftButtonUp="MainControl_MouseLeftButtonUp" MouseLeave="MainControl_MouseLeave">
-    <Grid x:Name="MainGrid" Background="#FF4B4B4B" MouseMove="MainGrid_MouseMove" MouseLeftButtonUp="MainGrid_MouseLeftButtonUp">
+    <Grid x:Name="MainGrid" MouseMove="MainGrid_MouseMove" MouseLeftButtonUp="MainGrid_MouseLeftButtonUp">
         <Image x:Name="ControlImage"/>
+        <Polygon x:Name="BackgroundDim" Fill="#7F494949"/>
         <Border x:Name="PreviewRect" BorderThickness="2" BorderBrush="White" HorizontalAlignment="Left" Width="800" Height="450" VerticalAlignment="Top"/>
         <Rectangle x:Name="TopHandler" Fill="Black" Height="2" Stroke="Black" VerticalAlignment="Top" Margin="389,0,0,0" HorizontalAlignment="Left" Width="20" MouseLeftButtonDown="GrabHandler" MouseLeftButtonUp="ReleaseHandler" Cursor="SizeNS"/>
         <Rectangle x:Name="BottomHandler" Fill="Black" Height="2" Stroke="Black" VerticalAlignment="Top" Margin="389,448,0,0" HorizontalAlignment="Left" Width="20" MouseLeftButtonDown="GrabHandler" MouseLeftButtonUp="ReleaseHandler" Cursor="SizeNS"/>
