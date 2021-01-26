@@ -47,7 +47,7 @@ namespace WpfImageCutter
                     ControlImage.Source = value;
                     UpdateLayout();
                     UpdateBounds();
-                    UpdateHandlersPosition();                   
+                    UpdateHandlersPosition();
                 }
             }
         }
@@ -63,7 +63,7 @@ namespace WpfImageCutter
             }
             set
             {
-                if(value >= 1)
+                if (value >= 1)
                 {
                     PreviewRect.BorderThickness = new Thickness(value);
                     LeftHandler.Width = value;
@@ -89,7 +89,7 @@ namespace WpfImageCutter
             }
             set
             {
-                if(value>=1)
+                if (value >= 1)
                 {
                     LeftHandler.Height = value;
                     RightHandler.Height = value;
@@ -125,7 +125,7 @@ namespace WpfImageCutter
 
         private void UpdateTopBottomMiddlePosition()
         {
-            double position = LeftHandler.Margin.Left + (((RightHandler.Margin.Left + RightHandler.ActualWidth - LeftHandler.Margin.Left) / 2) - (TopHandler.ActualWidth / 2));            
+            double position = LeftHandler.Margin.Left + (((RightHandler.Margin.Left + RightHandler.ActualWidth - LeftHandler.Margin.Left) / 2) - (TopHandler.ActualWidth / 2));
 
             TopHandler.Margin = new Thickness(position, TopHandler.Margin.Top, 0, 0);
             BottomHandler.Margin = new Thickness(position, BottomHandler.Margin.Top, 0, 0);
@@ -242,8 +242,8 @@ namespace WpfImageCutter
                 }
                 UpdatePreview();
             }
-            else if(MoveAllHandlers)
-            {                
+            else if (MoveAllHandlers)
+            {
                 MoveHandlers(e.GetPosition(MainGrid));
             }
         }
@@ -268,7 +268,7 @@ namespace WpfImageCutter
         private void MainGrid_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             ActiveHandler = null;
-        }        
+        }
 
         private void MainControl_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
@@ -299,6 +299,25 @@ namespace WpfImageCutter
         private double Clamp(double value, double min, double max)
         {
             return (value < min) ? min : (value > max) ? max : value;
+        }
+
+        public CroppedBitmap CutImage()
+        {
+            if (Source != null)
+            {
+                BitmapImage source = (BitmapImage)Source;
+
+                int left = (int)(source.PixelWidth * (LeftHandler.Margin.Left - MinLeft) / ControlImage.ActualWidth);
+                int top = (int)(source.PixelHeight * (TopHandler.Margin.Top - MinTop)/ ControlImage.ActualHeight);
+                int width = (int)(source.PixelWidth * PreviewRect.ActualWidth / ControlImage.ActualWidth);
+                int height = (int)(source.PixelHeight * PreviewRect.ActualHeight / ControlImage.ActualHeight);
+
+                return new CroppedBitmap((BitmapImage)Source, new Int32Rect(left, top, width, height));
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }

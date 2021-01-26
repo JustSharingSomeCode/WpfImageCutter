@@ -31,5 +31,10 @@ namespace TestWindow
         {
             Cutter.Source = ImageTools.GetBitmapImage(ImageTools.SearchImage());
         }
+
+        private void CutImageBtn_Click(object sender, RoutedEventArgs e)
+        {
+            ImageResult.Source = Cutter.CutImage();
+        }
     }
 }
