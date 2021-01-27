@@ -35,6 +35,9 @@ namespace TestWindow
         private void CutImageBtn_Click(object sender, RoutedEventArgs e)
         {
             ImageResult.Source = Cutter.CutImage();
+
+            MessageBox.Show(((BitmapSource)ImageResult.Source).PixelWidth.ToString());
+            MessageBox.Show(((BitmapSource)ImageResult.Source).PixelHeight.ToString());
         }
     }
 }
