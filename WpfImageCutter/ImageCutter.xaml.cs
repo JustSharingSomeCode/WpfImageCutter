@@ -126,7 +126,7 @@ namespace WpfImageCutter
             {
                 if (value >= 0)
                 {
-                    minPixelWidth = value;
+                    minPixelWidth = value;                    
                     UpdateSizeRestriction();
                 }
             }
@@ -147,7 +147,7 @@ namespace WpfImageCutter
                 {
                     minPixelHeight = value;
                     UpdateSizeRestriction();
-                }
+                }                
             }
         }
         #endregion
@@ -193,9 +193,10 @@ namespace WpfImageCutter
         #region UpdateEvents
         private void UpdateBounds()
         {
-            MinLeft = (ActualWidth - ControlImage.ActualWidth) / 2;
+            ControlImage.Margin = new Thickness(BorderSize);
+            MinLeft = (ActualWidth - ControlImage.ActualWidth) / 2 - LeftHandler.ActualWidth;
             MaxRight = ActualWidth - MinLeft - RightHandler.ActualWidth;
-            MinTop = (ActualHeight - ControlImage.ActualHeight) / 2;
+            MinTop = (ActualHeight - ControlImage.ActualHeight) / 2 - TopHandler.ActualHeight;
             MaxBottom = ActualHeight - MinTop - BottomHandler.ActualHeight;
             UpdateSizeRestriction();
         }
@@ -282,8 +283,8 @@ namespace WpfImageCutter
         {
             position = Clamp(position, MinLeft, RightHandler.Margin.Left - RightHandler.ActualWidth);
 
-            double min = RightHandler.Margin.Left - maxWidth;
-            double RestrictedPosition = Clamp(position, (maxWidth <= 0) ? 0 : min, RightHandler.Margin.Left - minWidth);
+            double min = (maxWidth <= 0) ? MinLeft : RightHandler.Margin.Left - BorderSize - maxWidth;
+            double RestrictedPosition = Clamp(position, min, RightHandler.Margin.Left - BorderSize - minWidth);
 
             LeftHandler.Margin = new Thickness(RestrictedPosition, LeftHandler.Margin.Top, 0, 0);
             UpdateTopBottomMiddlePosition();
@@ -293,8 +294,8 @@ namespace WpfImageCutter
         {
             position = Clamp(position, LeftHandler.Margin.Left + LeftHandler.ActualWidth, MaxRight);
 
-            double min = LeftHandler.Margin.Left + minWidth;
-            double max = (maxWidth <= 0)? MaxRight : LeftHandler.Margin.Left + maxWidth;
+            double min = LeftHandler.Margin.Left + BorderSize + minWidth;
+            double max = (maxWidth <= 0)? MaxRight : LeftHandler.Margin.Left + BorderSize + maxWidth;
             double RestrictedPosition = Clamp(position, min, max);
 
             RightHandler.Margin = new Thickness(RestrictedPosition, RightHandler.Margin.Top, 0, 0);
@@ -305,8 +306,8 @@ namespace WpfImageCutter
         {
             position = Clamp(position, MinTop, BottomHandler.Margin.Top - BottomHandler.ActualHeight);
 
-            double min = (maxHeight <= 0) ? MinTop : BottomHandler.Margin.Top - maxHeight;
-            double max = BottomHandler.Margin.Top - minHeight;
+            double min = (maxHeight <= 0) ? MinTop : BottomHandler.Margin.Top - BorderSize - maxHeight;
+            double max = BottomHandler.Margin.Top - BorderSize - minHeight;
             double RestrictedPosition = Clamp(position, min, max);
 
             TopHandler.Margin = new Thickness(TopHandler.Margin.Left, RestrictedPosition, 0, 0);
@@ -317,8 +318,8 @@ namespace WpfImageCutter
         {
             position = Clamp(position, TopHandler.Margin.Top + TopHandler.ActualHeight, MaxBottom);
 
-            double min = TopHandler.Margin.Top + minHeight;
-            double max = (maxHeight <= 0) ? MaxBottom : TopHandler.Margin.Top + maxHeight;
+            double min = TopHandler.Margin.Top + BorderSize + minHeight;
+            double max = (maxHeight <= 0) ? MaxBottom : TopHandler.Margin.Top + BorderSize + maxHeight;
             double RestrictedPosition = Clamp(position, min, max);
 
             BottomHandler.Margin = new Thickness(BottomHandler.Margin.Left, RestrictedPosition, 0, 0);
@@ -425,11 +426,14 @@ namespace WpfImageCutter
         public CroppedBitmap CutImage()
         {
             if (Source != null)
-            {                                
+            {                
                 int left = (int)(PixelWidth * (LeftHandler.Margin.Left - MinLeft) / ControlImage.ActualWidth);
                 int top = (int)(PixelHeight * (TopHandler.Margin.Top - MinTop)/ ControlImage.ActualHeight);
-                int width = (int)(PixelWidth * PreviewRect.ActualWidth / ControlImage.ActualWidth);
-                int height = (int)(PixelHeight * PreviewRect.ActualHeight / ControlImage.ActualHeight);
+                int width = (int)(PixelWidth * (PreviewRect.ActualWidth - (BorderSize * 2)) / ControlImage.ActualWidth);
+                int height = (int)(PixelHeight * (PreviewRect.ActualHeight - (BorderSize * 2)) / ControlImage.ActualHeight);
+
+                width = (int)Clamp(width, minPixelWidth, maxPixelWidth);
+                height = (int)Clamp(height, minPixelHeight, maxPixelHeight);
 
                 return new CroppedBitmap((BitmapImage)Source, new Int32Rect(left, top, width, height));
             }

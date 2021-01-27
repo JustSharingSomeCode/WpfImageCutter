@@ -9,7 +9,7 @@
         Title="MainWindow" Height="450" Width="800">
     <Grid Background="#FF383838">
 
-        <WpfImageCutter:ImageCutter x:Name="Cutter" Height="301" VerticalAlignment="Top" Margin="10,10,200,0" BorderSize="2" HandlerLenght="40" Background="#FF7E7E7E" SnapsToDevicePixels="True" MinPixelWidth="50" MaxPixelWidth="500" MinPixelHeight="50" MaxPixelHeight="500"/>
+        <WpfImageCutter:ImageCutter x:Name="Cutter" Height="301" VerticalAlignment="Top" Margin="10,10,200,0" BorderSize="5" HandlerLenght="40" Background="#FF7E7E7E" SnapsToDevicePixels="True" MinPixelWidth="60" MaxPixelWidth="1000" MinPixelHeight="60" MaxPixelHeight="568"/>
         <Button x:Name="LoadImageBtn" Content="Load Image" HorizontalAlignment="Left" Margin="10,389,0,0" VerticalAlignment="Top" Width="298" Click="LoadImageBtn_Click"/>
         <Button x:Name="CutImageBtn" Content="Cut Image" HorizontalAlignment="Left" Margin="313,389,0,0" VerticalAlignment="Top" Width="298" Click="CutImageBtn_Click"/>
         <Image x:Name="ImageResult" Height="166" Margin="0,10,10,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="166"/>
