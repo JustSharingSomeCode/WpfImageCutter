@@ -26,6 +26,12 @@ namespace WpfImageCutter
             InitializeComponent();
         }
 
+        //Image size in pixels
+        private int PixelWidth = 1, PixelHeight = 1;
+        //Min and max size on pixels to cut
+        private int minPixelWidth = 0, minPixelHeight = 0, maxPixelWidth = 0, maxPixelHeight = 0;
+        //Scalable min and max size of the PreviewRect
+        private double minWidth, minHeight, maxWidth, maxHeight;
         //Cutter bounds
         private double MinLeft, MinTop, MaxRight, MaxBottom;
         //Active handle
@@ -45,6 +51,10 @@ namespace WpfImageCutter
                 if (value != null)
                 {
                     ControlImage.Source = value;
+
+                    PixelWidth = ((BitmapSource)value).PixelWidth;
+                    PixelHeight = ((BitmapSource)value).PixelHeight;
+
                     UpdateLayout();
                     UpdateBounds();
                     UpdateHandlersPosition();
@@ -104,6 +114,78 @@ namespace WpfImageCutter
         }
         #endregion
 
+        #region MinPixelWidthProperty
+        public int MinPixelWidth
+        {
+            get
+            {
+                return minPixelWidth;
+            }
+            set
+            {
+                if (value >= 0)
+                {
+                    minPixelWidth = value;
+                    UpdateSizeRestriction();
+                }
+            }
+        }
+        #endregion
+
+        #region MinPixelHeightProperty
+        public int MinPixelHeight
+        {
+            get
+            {
+                return minPixelHeight;
+            }
+            set
+            {
+                if (value >= 0)
+                {
+                    minPixelHeight = value;
+                    UpdateSizeRestriction();
+                }
+            }
+        }
+        #endregion
+
+        #region MaxPixelWidthProperty
+        public int MaxPixelWidth
+        {
+            get
+            {
+                return maxPixelWidth;
+            }
+            set
+            {
+                if (value >= 0 && value > minPixelWidth)
+                {
+                    maxPixelWidth = value;
+                    UpdateSizeRestriction();
+                }
+            }
+        }
+        #endregion
+
+        #region MaxPixelHeightProperty
+        public int MaxPixelHeight
+        {
+            get
+            {
+                return maxPixelHeight;
+            }
+            set
+            {
+                if (value >= 0 && value > minPixelHeight)
+                {
+                    maxPixelHeight = value;
+                    UpdateSizeRestriction();
+                }
+            }
+        }
+        #endregion
+
         #region UpdateEvents
         private void UpdateBounds()
         {
@@ -111,6 +193,7 @@ namespace WpfImageCutter
             MaxRight = ActualWidth - MinLeft - RightHandler.ActualWidth;
             MinTop = (ActualHeight - ControlImage.ActualHeight) / 2;
             MaxBottom = ActualHeight - MinTop - BottomHandler.ActualHeight;
+            UpdateSizeRestriction();
         }
 
         private void UpdateHandlersPosition()
@@ -165,6 +248,17 @@ namespace WpfImageCutter
             BackgroundDim.Points.Add(new Point(LeftHandler.Margin.Left, BottomHandler.Margin.Top));
             BackgroundDim.Points.Add(new Point(MinLeft, MaxBottom + BottomHandler.ActualHeight));
         }
+
+        private void UpdateSizeRestriction()
+        {
+            minWidth = minPixelWidth * ControlImage.ActualWidth / PixelWidth;
+            minHeight = minPixelHeight * ControlImage.ActualHeight / PixelHeight;
+
+            maxWidth = maxPixelWidth * ControlImage.ActualWidth / PixelWidth;
+            maxHeight = maxPixelHeight * ControlImage.ActualHeight / PixelHeight;
+
+            UpdateHandlersPosition();
+        }
         #endregion
 
         #region Grab/Release
@@ -182,13 +276,24 @@ namespace WpfImageCutter
         #region HandleMovement
         private void MoveLeftHandler(double position)
         {
-            LeftHandler.Margin = new Thickness(Clamp(position, MinLeft, RightHandler.Margin.Left), LeftHandler.Margin.Top, 0, 0);
+            position = Clamp(position, MinLeft, RightHandler.Margin.Left - RightHandler.ActualWidth);
+
+            double min = RightHandler.Margin.Left - maxWidth;
+            double RestrictedPosition = Clamp(position, (maxWidth <= 0) ? 0 : min, RightHandler.Margin.Left - minWidth);
+
+            LeftHandler.Margin = new Thickness(RestrictedPosition, LeftHandler.Margin.Top, 0, 0);
             UpdateTopBottomMiddlePosition();
         }
 
         private void MoveRightHandler(double position)
         {
-            RightHandler.Margin = new Thickness(Clamp(position, LeftHandler.Margin.Left, MaxRight), RightHandler.Margin.Top, 0, 0);
+            position = Clamp(position, LeftHandler.Margin.Left, MaxRight);
+
+            double min = LeftHandler.Margin.Left + minWidth;
+            double max = (maxWidth <= 0)? MaxRight : LeftHandler.Margin.Left + maxWidth;
+            double RestrictedPosition = Clamp(position, min, max);
+
+            RightHandler.Margin = new Thickness(RestrictedPosition, RightHandler.Margin.Top, 0, 0);
             UpdateTopBottomMiddlePosition();
         }
 
@@ -260,7 +365,7 @@ namespace WpfImageCutter
 
         private void MainControl_Loaded(object sender, RoutedEventArgs e)
         {
-            UpdateBounds();
+            UpdateBounds();                       
             UpdateTopBottomMiddlePosition();
             UpdateLeftRightMiddlePosition();
         }
@@ -304,20 +409,18 @@ namespace WpfImageCutter
         public CroppedBitmap CutImage()
         {
             if (Source != null)
-            {
-                BitmapImage source = (BitmapImage)Source;
-
-                int left = (int)(source.PixelWidth * (LeftHandler.Margin.Left - MinLeft) / ControlImage.ActualWidth);
-                int top = (int)(source.PixelHeight * (TopHandler.Margin.Top - MinTop)/ ControlImage.ActualHeight);
-                int width = (int)(source.PixelWidth * PreviewRect.ActualWidth / ControlImage.ActualWidth);
-                int height = (int)(source.PixelHeight * PreviewRect.ActualHeight / ControlImage.ActualHeight);
+            {                                
+                int left = (int)(PixelWidth * (LeftHandler.Margin.Left - MinLeft) / ControlImage.ActualWidth);
+                int top = (int)(PixelHeight * (TopHandler.Margin.Top - MinTop)/ ControlImage.ActualHeight);
+                int width = (int)(PixelWidth * PreviewRect.ActualWidth / ControlImage.ActualWidth);
+                int height = (int)(PixelHeight * PreviewRect.ActualHeight / ControlImage.ActualHeight);
 
                 return new CroppedBitmap((BitmapImage)Source, new Int32Rect(left, top, width, height));
             }
             else
             {
                 return null;
-            }
-        }
+            }            
+        }        
     }
 }
