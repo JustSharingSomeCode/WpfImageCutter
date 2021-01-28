@@ -36,6 +36,7 @@ namespace WpfImageCutter
         private double MinLeft, MinTop, MaxRight, MaxBottom;
         //Active handle
         private Rectangle ActiveHandler;
+        //Allows the movement of all handlers
         private bool MoveAllHandlers = false;
 
         #region SourceProperty
@@ -279,50 +280,62 @@ namespace WpfImageCutter
         #endregion
 
         #region HandleMovement
-        private void MoveLeftHandler(double position)
+        private void MoveLeftHandler(double position, bool enableRestrictions = true)
         {
             position = Clamp(position, MinLeft, RightHandler.Margin.Left - RightHandler.ActualWidth);
 
-            double min = (maxWidth <= 0) ? MinLeft : RightHandler.Margin.Left - BorderSize - maxWidth;
-            double RestrictedPosition = Clamp(position, min, RightHandler.Margin.Left - BorderSize - minWidth);
+            if(enableRestrictions)
+            {
+                double min = (maxWidth <= 0) ? MinLeft : RightHandler.Margin.Left - BorderSize - maxWidth;
+                position = Clamp(position, min, RightHandler.Margin.Left - BorderSize - minWidth);
+            }            
 
-            LeftHandler.Margin = new Thickness(RestrictedPosition, LeftHandler.Margin.Top, 0, 0);
+            LeftHandler.Margin = new Thickness(position, LeftHandler.Margin.Top, 0, 0);
             UpdateTopBottomMiddlePosition();
         }
 
-        private void MoveRightHandler(double position)
+        private void MoveRightHandler(double position, bool enableRestrictions = true)
         {
             position = Clamp(position, LeftHandler.Margin.Left + LeftHandler.ActualWidth, MaxRight);
 
-            double min = LeftHandler.Margin.Left + BorderSize + minWidth;
-            double max = (maxWidth <= 0)? MaxRight : LeftHandler.Margin.Left + BorderSize + maxWidth;
-            double RestrictedPosition = Clamp(position, min, max);
+            if (enableRestrictions)
+            {
+                double min = LeftHandler.Margin.Left + BorderSize + minWidth;
+                double max = (maxWidth <= 0) ? MaxRight : LeftHandler.Margin.Left + BorderSize + maxWidth;
+                position = Clamp(position, min, max);
+            }
 
-            RightHandler.Margin = new Thickness(RestrictedPosition, RightHandler.Margin.Top, 0, 0);
+            RightHandler.Margin = new Thickness(position, RightHandler.Margin.Top, 0, 0);
             UpdateTopBottomMiddlePosition();
         }
 
-        private void MoveTopHandler(double position)
+        private void MoveTopHandler(double position, bool enableRestrictions = true)
         {
             position = Clamp(position, MinTop, BottomHandler.Margin.Top - BottomHandler.ActualHeight);
 
-            double min = (maxHeight <= 0) ? MinTop : BottomHandler.Margin.Top - BorderSize - maxHeight;
-            double max = BottomHandler.Margin.Top - BorderSize - minHeight;
-            double RestrictedPosition = Clamp(position, min, max);
+            if (enableRestrictions)
+            {
+                double min = (maxHeight <= 0) ? MinTop : BottomHandler.Margin.Top - BorderSize - maxHeight;
+                double max = BottomHandler.Margin.Top - BorderSize - minHeight;
+                position = Clamp(position, min, max);
+            }
 
-            TopHandler.Margin = new Thickness(TopHandler.Margin.Left, RestrictedPosition, 0, 0);
+            TopHandler.Margin = new Thickness(TopHandler.Margin.Left, position, 0, 0);
             UpdateLeftRightMiddlePosition();
         }
 
-        private void MoveBottomHandler(double position)
+        private void MoveBottomHandler(double position, bool enableRestrictions = true)
         {
             position = Clamp(position, TopHandler.Margin.Top + TopHandler.ActualHeight, MaxBottom);
 
-            double min = TopHandler.Margin.Top + BorderSize + minHeight;
-            double max = (maxHeight <= 0) ? MaxBottom : TopHandler.Margin.Top + BorderSize + maxHeight;
-            double RestrictedPosition = Clamp(position, min, max);
+            if (enableRestrictions)
+            {
+                double min = TopHandler.Margin.Top + BorderSize + minHeight;
+                double max = (maxHeight <= 0) ? MaxBottom : TopHandler.Margin.Top + BorderSize + maxHeight;
+                position = Clamp(position, min, max);
+            }
 
-            BottomHandler.Margin = new Thickness(BottomHandler.Margin.Left, RestrictedPosition, 0, 0);
+            BottomHandler.Margin = new Thickness(BottomHandler.Margin.Left, position, 0, 0);
             UpdateLeftRightMiddlePosition();
         }
 
@@ -335,10 +348,10 @@ namespace WpfImageCutter
 
             PreviewRect.Margin = new Thickness(maxright, maxbottom, 0, 0);
 
-            MoveLeftHandler(PreviewRect.Margin.Left);
-            MoveTopHandler(PreviewRect.Margin.Top);
-            MoveRightHandler(PreviewRect.Margin.Left + PreviewRect.ActualWidth - RightHandler.ActualWidth);
-            MoveBottomHandler(PreviewRect.Margin.Top + PreviewRect.ActualHeight - BottomHandler.ActualHeight);
+            MoveLeftHandler(PreviewRect.Margin.Left, false);
+            MoveTopHandler(PreviewRect.Margin.Top, false);
+            MoveRightHandler(PreviewRect.Margin.Left + PreviewRect.ActualWidth - RightHandler.ActualWidth, false);
+            MoveBottomHandler(PreviewRect.Margin.Top + PreviewRect.ActualHeight - BottomHandler.ActualHeight, false);
 
             UpdatePreview();
         }
