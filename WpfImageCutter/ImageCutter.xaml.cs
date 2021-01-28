@@ -26,6 +26,7 @@ namespace WpfImageCutter
             InitializeComponent();
         }
 
+        #region PrivateVariables
         //Image size in pixels
         private int PixelWidth = 1, PixelHeight = 1;
         //Min and max size on pixels to cut
@@ -38,9 +39,11 @@ namespace WpfImageCutter
         private Rectangle ActiveHandler;
         //Allows the movement of all handlers
         private bool MoveAllHandlers = false;
+        #endregion
 
         #region SourceProperty
         [Category("ImageCutter Properties")]
+        [Description("Gets or sets the image to cut")]
         public ImageSource Source
         {
             get
@@ -66,6 +69,7 @@ namespace WpfImageCutter
 
         #region BorderSizeProperty
         [Category("ImageCutter Properties")]
+        [Description("Gets or sets the size of the border")]
         public int BorderSize
         {
             get
@@ -92,7 +96,8 @@ namespace WpfImageCutter
 
         #region HandlerLenghtProperty
         [Category("ImageCutter Properties")]
-        public double HandlerLenght
+        [Description("Gets or sets the length of all handlers")]
+        public double HandlerLength
         {
             get
             {
@@ -117,6 +122,7 @@ namespace WpfImageCutter
 
         #region MinPixelWidthProperty
         [Category("ImageCutter Properties")]
+        [Description("Gets or sets the min width in pixels to cut")]
         public int MinPixelWidth
         {
             get
@@ -136,6 +142,7 @@ namespace WpfImageCutter
 
         #region MinPixelHeightProperty
         [Category("ImageCutter Properties")]
+        [Description("Gets or sets the min height in pixels to cut")]
         public int MinPixelHeight
         {
             get
@@ -155,6 +162,7 @@ namespace WpfImageCutter
 
         #region MaxPixelWidthProperty
         [Category("ImageCutter Properties")]
+        [Description("Gets or sets the max width in pixels to cut")]
         public int MaxPixelWidth
         {
             get
@@ -163,7 +171,7 @@ namespace WpfImageCutter
             }
             set
             {
-                if (value >= 0 && value > minPixelWidth)
+                if (value >= 0 && value >= minPixelWidth)
                 {
                     maxPixelWidth = value;
                     UpdateSizeRestriction();
@@ -174,6 +182,7 @@ namespace WpfImageCutter
 
         #region MaxPixelHeightProperty
         [Category("ImageCutter Properties")]
+        [Description("Gets or sets the max height in pixels to cut")]
         public int MaxPixelHeight
         {
             get
@@ -182,7 +191,7 @@ namespace WpfImageCutter
             }
             set
             {
-                if (value >= 0 && value > minPixelHeight)
+                if (value >= 0 && value >= minPixelHeight)
                 {
                     maxPixelHeight = value;
                     UpdateSizeRestriction();
@@ -192,6 +201,9 @@ namespace WpfImageCutter
         #endregion
 
         #region UpdateEvents
+        /// <summary>
+        /// Updates the bounds in which the handlers can move
+        /// </summary>
         private void UpdateBounds()
         {
             ControlImage.Margin = new Thickness(BorderSize);
@@ -202,6 +214,9 @@ namespace WpfImageCutter
             UpdateSizeRestriction();
         }
 
+        /// <summary>
+        /// Moves the handlers position to its max
+        /// </summary>
         private void UpdateHandlersPosition()
         {
             MoveLeftHandler(0);
@@ -212,6 +227,9 @@ namespace WpfImageCutter
             UpdatePreview();
         }
 
+        /// <summary>
+        /// Keeps the top and bottom handlers aligned at the center
+        /// </summary>
         private void UpdateTopBottomMiddlePosition()
         {
             double position = LeftHandler.Margin.Left + (((RightHandler.Margin.Left + RightHandler.ActualWidth - LeftHandler.Margin.Left) / 2) - (TopHandler.ActualWidth / 2));
@@ -220,6 +238,9 @@ namespace WpfImageCutter
             BottomHandler.Margin = new Thickness(position, BottomHandler.Margin.Top, 0, 0);
         }
 
+        /// <summary>
+        /// Keeps the left and right handlers aligned at the center
+        /// </summary>
         private void UpdateLeftRightMiddlePosition()
         {
             double position = TopHandler.Margin.Top + (((BottomHandler.Margin.Top + BottomHandler.ActualHeight - TopHandler.Margin.Top) / 2) - (LeftHandler.ActualHeight / 2));
@@ -228,6 +249,9 @@ namespace WpfImageCutter
             RightHandler.Margin = new Thickness(RightHandler.Margin.Left, position, 0, 0);
         }
 
+        /// <summary>
+        /// Updates the <see cref="PreviewRect"/> size
+        /// </summary>
         private void UpdatePreview()
         {
             PreviewRect.Margin = new Thickness(LeftHandler.Margin.Left, TopHandler.Margin.Top, 0, 0);
@@ -237,6 +261,9 @@ namespace WpfImageCutter
             UpdateBackgroundDim();
         }
 
+        /// <summary>
+        /// Updates the <see cref="PointCollection"/> of <see cref="BackgroundDim"/>
+        /// </summary>
         private void UpdateBackgroundDim()
         {
             BackgroundDim.Points.Clear();
@@ -255,6 +282,9 @@ namespace WpfImageCutter
             BackgroundDim.Points.Add(new Point(MinLeft, MaxBottom + BottomHandler.ActualHeight));
         }
 
+        /// <summary>
+        /// Updates the restrictions of the cutter and the handlers positions
+        /// </summary>
         private void UpdateSizeRestriction()
         {
             minWidth = minPixelWidth * ControlImage.ActualWidth / PixelWidth;
@@ -280,6 +310,11 @@ namespace WpfImageCutter
         #endregion
 
         #region HandleMovement
+        /// <summary>
+        /// Moves the <see cref="LeftHandler"/> to a given position
+        /// </summary>
+        /// <param name="position">Position from left to right</param>
+        /// <param name="enableRestrictions">If it is false, it will not take into account the restrictions given by the user</param>
         private void MoveLeftHandler(double position, bool enableRestrictions = true)
         {
             position = Clamp(position, MinLeft, RightHandler.Margin.Left - RightHandler.ActualWidth);
@@ -294,6 +329,11 @@ namespace WpfImageCutter
             UpdateTopBottomMiddlePosition();
         }
 
+        /// <summary>
+        /// Moves the <see cref="RightHandler"/> to a given position
+        /// </summary>
+        /// <param name="position">Position from left to right</param>
+        /// <param name="enableRestrictions">If it is false, it will not take into account the restrictions given by the user</param>
         private void MoveRightHandler(double position, bool enableRestrictions = true)
         {
             position = Clamp(position, LeftHandler.Margin.Left + LeftHandler.ActualWidth, MaxRight);
@@ -309,6 +349,11 @@ namespace WpfImageCutter
             UpdateTopBottomMiddlePosition();
         }
 
+        /// <summary>
+        /// Moves the <see cref="TopHandler"/> to a given position
+        /// </summary>
+        /// <param name="position">Position from top to bottom</param>
+        /// <param name="enableRestrictions">If it is false, it will not take into account the restrictions given by the user</param>
         private void MoveTopHandler(double position, bool enableRestrictions = true)
         {
             position = Clamp(position, MinTop, BottomHandler.Margin.Top - BottomHandler.ActualHeight);
@@ -324,6 +369,11 @@ namespace WpfImageCutter
             UpdateLeftRightMiddlePosition();
         }
 
+        /// <summary>
+        /// Moves the <see cref="BottomHandler"/> to a given position
+        /// </summary>
+        /// <param name="position">Position from top to bottom</param>
+        /// <param name="enableRestrictions">If it is false, it will not take into account the restrictions given by the user</param>
         private void MoveBottomHandler(double position, bool enableRestrictions = true)
         {
             position = Clamp(position, TopHandler.Margin.Top + TopHandler.ActualHeight, MaxBottom);
@@ -339,10 +389,15 @@ namespace WpfImageCutter
             UpdateLeftRightMiddlePosition();
         }
 
+        /// <summary>
+        /// Moves all handlers to a given <see cref="Point"/>
+        /// </summary>
+        /// <param name="position">Central <see cref="Point"/></param>
         private void MoveHandlers(Point position)
         {
+            //bounds
             double maxright, maxbottom;
-
+            
             maxright = Clamp(position.X - PreviewRect.ActualWidth / 2, MinLeft, MaxRight - PreviewRect.ActualWidth + RightHandler.ActualWidth);
             maxbottom = Clamp(position.Y - PreviewRect.ActualHeight / 2, MinTop, MaxBottom - PreviewRect.ActualHeight + BottomHandler.ActualHeight);
 
@@ -356,6 +411,10 @@ namespace WpfImageCutter
             UpdatePreview();
         }
 
+        /// <summary>
+        /// Decides which handler moves depending on its name
+        /// </summary>
+        /// <param name="sender"><see cref="Rectangle"/> Handler</param>        
         private void MainGrid_MouseMove(object sender, MouseEventArgs e)
         {
             if (ActiveHandler != null)
@@ -385,6 +444,7 @@ namespace WpfImageCutter
         #endregion                       
 
         #region LocalEvents
+        //Updates the bounds when the size of the control is changed
         private void MainControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             UpdateBounds();
@@ -393,6 +453,7 @@ namespace WpfImageCutter
             UpdateLeftRightMiddlePosition();
         }
 
+        //Updates the bounds when the control is loaded
         private void MainControl_Loaded(object sender, RoutedEventArgs e)
         {
             UpdateBounds();                       
@@ -400,31 +461,37 @@ namespace WpfImageCutter
             UpdateLeftRightMiddlePosition();
         }
 
+        //Sets the ActiveHandler to null
         private void MainGrid_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             ActiveHandler = null;
         }
 
+        //Sets the ActiveHandler to null
         private void MainControl_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             ActiveHandler = null;
         }
 
+        //Sets the ActiveHandler to null
         private void MainControl_MouseLeave(object sender, MouseEventArgs e)
         {
             ActiveHandler = null;
         }
 
+        //Enables the movement of all handlers
         private void PreviewRect_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             MoveAllHandlers = true;
         }
 
+        //Disables the movement of all handlers
         private void PreviewRect_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             MoveAllHandlers = false;
         }
 
+        //Disables the movement of all handlers
         private void PreviewRect_MouseLeave(object sender, MouseEventArgs e)
         {
             MoveAllHandlers = false;
