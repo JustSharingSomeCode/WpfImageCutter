@@ -219,9 +219,9 @@ namespace WpfImageCutter
         /// </summary>
         private void UpdateHandlersPosition()
         {
-            MoveLeftHandler(0);
+            MoveLeftHandler(0, false);
+            MoveTopHandler(0, false);
             MoveRightHandler(ActualWidth);
-            MoveTopHandler(0);
             MoveBottomHandler(ActualHeight);
 
             UpdatePreview();
@@ -496,13 +496,20 @@ namespace WpfImageCutter
         {
             MoveAllHandlers = false;
         }
-        #endregion                
+        #endregion
 
+        #region Clamp
         private double Clamp(double value, double min, double max)
         {
             return (value < min) ? min : (value > max) ? max : value;
         }
+        #endregion
 
+        #region ImageCropping
+        /// <summary>
+        /// Cuts the area of the image inside the <see cref="PreviewRect"/>
+        /// </summary>
+        /// <returns>Null if source is null or if width or height are equal to 0, else return a <see cref="CroppedBitmap"/></returns>
         public CroppedBitmap CutImage()
         {
             if (Source != null)
@@ -512,8 +519,13 @@ namespace WpfImageCutter
                 int width = (int)(PixelWidth * (PreviewRect.ActualWidth - (BorderSize * 2)) / ControlImage.ActualWidth);
                 int height = (int)(PixelHeight * (PreviewRect.ActualHeight - (BorderSize * 2)) / ControlImage.ActualHeight);
 
-                width = (int)Clamp(width, minPixelWidth, maxPixelWidth);
-                height = (int)Clamp(height, minPixelHeight, maxPixelHeight);
+                width = (int)Clamp(width, minPixelWidth, (maxPixelWidth > 0) ? maxPixelWidth : PixelWidth);
+                height = (int)Clamp(height, minPixelHeight, (maxPixelHeight > 0) ? maxPixelHeight : PixelHeight);
+
+                if (width <= 0 || height <= 0)
+                {
+                    return null;
+                }
 
                 return new CroppedBitmap((BitmapImage)Source, new Int32Rect(left, top, width, height));
             }
@@ -521,6 +533,7 @@ namespace WpfImageCutter
             {
                 return null;
             }            
-        }        
+        }
+        #endregion
     }
 }
