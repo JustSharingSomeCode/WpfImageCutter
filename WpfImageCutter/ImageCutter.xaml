@@ -8,11 +8,11 @@
              d:DesignHeight="450" d:DesignWidth="800" SizeChanged="MainControl_SizeChanged" Loaded="MainControl_Loaded" MouseLeftButtonUp="MainControl_MouseLeftButtonUp" MouseLeave="MainControl_MouseLeave">
     <Grid x:Name="MainGrid" MouseMove="MainGrid_MouseMove" MouseLeftButtonUp="MainGrid_MouseLeftButtonUp">
         <Image x:Name="ControlImage"/>
-        <Polygon x:Name="BackgroundDim" Fill="#7F494949"/>
-        <Border x:Name="PreviewRect" BorderThickness="2" BorderBrush="White" HorizontalAlignment="Left" Width="800" Height="450" VerticalAlignment="Top" MouseLeftButtonDown="PreviewRect_MouseLeftButtonDown" MouseLeftButtonUp="PreviewRect_MouseLeftButtonUp" Background="#00000000" MouseLeave="PreviewRect_MouseLeave"/>
-        <Rectangle x:Name="TopHandler" Fill="Black" Height="2" Stroke="Black" VerticalAlignment="Top" Margin="389,0,0,0" HorizontalAlignment="Left" Width="20" MouseLeftButtonDown="GrabHandler" MouseLeftButtonUp="ReleaseHandler" Cursor="SizeNS"/>
-        <Rectangle x:Name="BottomHandler" Fill="Black" Height="2" Stroke="Black" VerticalAlignment="Top" Margin="389,448,0,0" HorizontalAlignment="Left" Width="20" MouseLeftButtonDown="GrabHandler" MouseLeftButtonUp="ReleaseHandler" Cursor="SizeNS"/>
-        <Rectangle x:Name="LeftHandler" Fill="Black" Height="20" Stroke="Black" VerticalAlignment="Top" Margin="0,225,0,0" HorizontalAlignment="Left" Width="2" MouseLeftButtonDown="GrabHandler" MouseLeftButtonUp="ReleaseHandler" Cursor="SizeWE"/>
-        <Rectangle x:Name="RightHandler" Fill="Black" Height="20" Stroke="Black" VerticalAlignment="Top" Margin="798,225,0,0" HorizontalAlignment="Left" Width="2" MouseLeftButtonDown="GrabHandler" MouseLeftButtonUp="ReleaseHandler" Cursor="SizeWE"/>
+        <Polygon x:Name="BackgroundDim" Fill="{Binding ElementName=MainControl, Path=BackgroundDimColor}"/>
+        <Border x:Name="PreviewRect" BorderThickness="2" BorderBrush="{Binding ElementName=MainControl, Path=BorderColor}" HorizontalAlignment="Left" Width="800" Height="450" VerticalAlignment="Top" MouseLeftButtonDown="PreviewRect_MouseLeftButtonDown" MouseLeftButtonUp="PreviewRect_MouseLeftButtonUp" Background="#00000000" MouseLeave="PreviewRect_MouseLeave"/>
+        <Rectangle x:Name="TopHandler" Fill="{Binding ElementName=MainControl, Path=HandlerBrush}" Height="2" VerticalAlignment="Top" Margin="389,0,0,0" HorizontalAlignment="Left" Width="20" MouseLeftButtonDown="GrabHandler" MouseLeftButtonUp="ReleaseHandler" Cursor="SizeNS"/>
+        <Rectangle x:Name="BottomHandler" Fill="{Binding ElementName=MainControl, Path=HandlerBrush}" Height="2" VerticalAlignment="Top" Margin="389,448,0,0" HorizontalAlignment="Left" Width="20" MouseLeftButtonDown="GrabHandler" MouseLeftButtonUp="ReleaseHandler" Cursor="SizeNS"/>
+        <Rectangle x:Name="LeftHandler" Fill="{Binding ElementName=MainControl, Path=HandlerBrush}" Height="20" VerticalAlignment="Top" Margin="0,225,0,0" HorizontalAlignment="Left" Width="2" MouseLeftButtonDown="GrabHandler" MouseLeftButtonUp="ReleaseHandler" Cursor="SizeWE"/>
+        <Rectangle x:Name="RightHandler" Fill="{Binding ElementName=MainControl, Path=HandlerBrush}" Height="20" VerticalAlignment="Top" Margin="798,225,0,0" HorizontalAlignment="Left" Width="2" MouseLeftButtonDown="GrabHandler" MouseLeftButtonUp="ReleaseHandler" Cursor="SizeWE"/>
     </Grid>
 </UserControl>

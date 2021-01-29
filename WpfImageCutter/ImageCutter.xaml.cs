@@ -200,6 +200,48 @@ namespace WpfImageCutter
         }
         #endregion
 
+        #region HandlerBrushProperty
+        [Category("ImageCutter Properties")]
+        [Description("Gets or sets the brush that paints the handlers")]
+        public Brush HandlerBrush
+        {
+            get { return (Brush)GetValue(HandlerBrushProperty); }
+            set { SetValue(HandlerBrushProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for HandlersBrush.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty HandlerBrushProperty =
+            DependencyProperty.Register("HandlerBrush", typeof(Brush), typeof(ImageCutter), new PropertyMetadata(Brushes.Black));
+        #endregion
+
+        #region BorderColorProperty
+        [Category("ImageCutter Properties")]
+        [Description("Gets or sets the brush that paints the border")]
+        public Brush BorderColor
+        {
+            get { return (Brush)GetValue(BorderColorProperty); }
+            set { SetValue(BorderColorProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for BorderColor.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty BorderColorProperty =
+            DependencyProperty.Register("BorderColor", typeof(Brush), typeof(ImageCutter), new PropertyMetadata(Brushes.White));
+        #endregion
+
+        #region BackgroundDimColorProperty
+        [Category("ImageCutter Properties")]
+        [Description("Gets or sets the brush that paints the area outside the cutter")]
+        public Brush BackgroundDimColor
+        {
+            get { return (Brush)GetValue(BackgroundDimColorProperty); }
+            set { SetValue(BackgroundDimColorProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for BackgroundDimColor.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty BackgroundDimColorProperty =
+            DependencyProperty.Register("BackgroundDimColor", typeof(Brush), typeof(ImageCutter), new PropertyMetadata(new SolidColorBrush(Color.FromArgb(102, 0, 0, 0))));
+        #endregion
+
         #region UpdateEvents
         /// <summary>
         /// Updates the bounds in which the handlers can move

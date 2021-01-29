@@ -8,9 +8,9 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid Background="#FF383838">
-        <WpfImageCutter:ImageCutter x:Name="Cutter" Height="300" VerticalAlignment="Top" Margin="10,10,200,0" BorderSize="5" HandlerLength="40" Background="#FF7E7E7E" SnapsToDevicePixels="True" MinPixelHeight="100" MinPixelWidth="100" MaxPixelWidth="2000" MaxPixelHeight="2000"/>
-        <Button x:Name="LoadImageBtn" Content="Load Image" HorizontalAlignment="Left" Margin="10,389,0,0" VerticalAlignment="Top" Width="298" Click="LoadImageBtn_Click"/>
-        <Button x:Name="CutImageBtn" Content="Cut Image" HorizontalAlignment="Left" Margin="313,389,0,0" VerticalAlignment="Top" Width="298" Click="CutImageBtn_Click"/>
+        <WpfImageCutter:ImageCutter x:Name="Cutter" Margin="10,10,200,35" BorderSize="5" HandlerLength="40" Background="#FF7E7E7E" SnapsToDevicePixels="True" MinPixelHeight="100" MinPixelWidth="100" MaxPixelWidth="2000" MaxPixelHeight="2000" HandlerBrush="White" BorderColor="#FF404040" BackgroundDimColor="#99000000"/>
+        <Button x:Name="LoadImageBtn" Content="Load Image" HorizontalAlignment="Left" Margin="10,0,0,10" VerticalAlignment="Bottom" Width="298" Click="LoadImageBtn_Click"/>
+        <Button x:Name="CutImageBtn" Content="Cut Image" HorizontalAlignment="Left" Margin="313,0,0,10" VerticalAlignment="Bottom" Width="298" Click="CutImageBtn_Click"/>
         <Image x:Name="ImageResult" Height="166" Margin="0,10,10,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="166"/>
     </Grid>
 </Window>
