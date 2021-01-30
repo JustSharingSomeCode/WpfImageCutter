@@ -39,6 +39,8 @@ namespace WpfImageCutter
         private Rectangle ActiveHandler;
         //Allows the movement of all handlers
         private bool MoveAllHandlers = false;
+
+        private bool useSourceAsBackground = false;
         #endregion
 
         #region SourceProperty
@@ -55,6 +57,11 @@ namespace WpfImageCutter
                 if (value != null)
                 {
                     ControlImage.Source = value;
+
+                    if(useSourceAsBackground)
+                    {
+                        BackgroundImage.Source = value;
+                    }
 
                     PixelWidth = ((BitmapSource)value).PixelWidth;
                     PixelHeight = ((BitmapSource)value).PixelHeight;
@@ -242,6 +249,30 @@ namespace WpfImageCutter
             DependencyProperty.Register("BackgroundDimColor", typeof(Brush), typeof(ImageCutter), new PropertyMetadata(new SolidColorBrush(Color.FromArgb(102, 0, 0, 0))));
         #endregion
 
+        #region UseSourceAsBackgroundProperty
+        [Category("ImageCutter Properties")]
+        public bool UseSourceAsBackground
+        {
+            get
+            {
+                return useSourceAsBackground;
+            }
+            set
+            {
+                useSourceAsBackground = value;
+
+                if (useSourceAsBackground)
+                {
+                    UpdateBackgroundImage();
+                }
+                else
+                {
+                    BackgroundImage.Source = null;
+                }
+            }
+        }
+        #endregion
+
         #region UpdateEvents
         /// <summary>
         /// Updates the bounds in which the handlers can move
@@ -336,6 +367,11 @@ namespace WpfImageCutter
             maxHeight = maxPixelHeight * ControlImage.ActualHeight / PixelHeight;
 
             UpdateHandlersPosition();
+        }
+
+        private void UpdateBackgroundImage()
+        {
+            BackgroundImage.Source = Source;
         }
         #endregion
 
@@ -551,7 +587,7 @@ namespace WpfImageCutter
         /// <summary>
         /// Cuts the area of the image inside the <see cref="PreviewRect"/>
         /// </summary>
-        /// <returns>Null if source is null or if width or height are equal to 0, else return a <see cref="CroppedBitmap"/></returns>
+        /// <returns>Null if source is null or if width or height are equal to 0, else returns a <see cref="CroppedBitmap"/></returns>
         public CroppedBitmap CutImage()
         {
             if (Source != null)
@@ -576,6 +612,6 @@ namespace WpfImageCutter
                 return null;
             }            
         }
-        #endregion
+        #endregion              
     }
 }

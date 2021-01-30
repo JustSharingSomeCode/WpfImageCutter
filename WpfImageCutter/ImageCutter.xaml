@@ -5,8 +5,13 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WpfImageCutter"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800" SizeChanged="MainControl_SizeChanged" Loaded="MainControl_Loaded" MouseLeftButtonUp="MainControl_MouseLeftButtonUp" MouseLeave="MainControl_MouseLeave">
+             d:DesignHeight="450" d:DesignWidth="800" SizeChanged="MainControl_SizeChanged" Loaded="MainControl_Loaded" MouseLeftButtonUp="MainControl_MouseLeftButtonUp" MouseLeave="MainControl_MouseLeave" ClipToBounds="True">
     <Grid x:Name="MainGrid" MouseMove="MainGrid_MouseMove" MouseLeftButtonUp="MainGrid_MouseLeftButtonUp">
+        <Image x:Name="BackgroundImage" Stretch="UniformToFill" Opacity="0.5" Margin="-10">
+            <Image.Effect>
+                <BlurEffect RenderingBias="Quality" Radius="30"/>
+            </Image.Effect>
+        </Image>
         <Image x:Name="ControlImage"/>
         <Polygon x:Name="BackgroundDim" Fill="{Binding ElementName=MainControl, Path=BackgroundDimColor}"/>
         <Border x:Name="PreviewRect" BorderThickness="2" BorderBrush="{Binding ElementName=MainControl, Path=BorderColor}" HorizontalAlignment="Left" Width="800" Height="450" VerticalAlignment="Top" MouseLeftButtonDown="PreviewRect_MouseLeftButtonDown" MouseLeftButtonUp="PreviewRect_MouseLeftButtonUp" Background="#00000000" MouseLeave="PreviewRect_MouseLeave"/>
