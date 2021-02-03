@@ -294,7 +294,7 @@ namespace WpfImageCutter
             MaxRight = ActualWidth - MinLeft - RightHandler.ActualWidth;
             MinTop = (ActualHeight - ControlImage.ActualHeight) / 2 - TopHandler.ActualHeight;
             MaxBottom = ActualHeight - MinTop - BottomHandler.ActualHeight;
-            UpdateSizeRestriction();
+            UpdateSizeRestriction();            
         }
 
         /// <summary>
@@ -306,12 +306,12 @@ namespace WpfImageCutter
             TopHandler.Margin = new Thickness(MinLeft, MinTop, 0, 0);
 
             MoveRightHandler(ActualWidth, false);
-            MoveBottomHandler(ActualHeight, false);
-
-            UpdatePreview();
+            MoveBottomHandler(ActualHeight, false);            
 
             UpdateTopBottomMiddlePosition();
             UpdateLeftRightMiddlePosition();
+
+            PrecalculatePreviewRectBounds();
         }
 
         /// <summary>
@@ -322,7 +322,9 @@ namespace WpfImageCutter
             if (!alignPositions)
             {
                 return;
-            }            
+            }
+
+            UpdatePreview();
 
             alignPosition = LeftHandler.Margin.Left + PreviewRect.ActualWidth / 2 - TopHandler.ActualWidth / 2;
 
@@ -338,7 +340,9 @@ namespace WpfImageCutter
             if(!alignPositions)
             {
                 return;
-            }            
+            }
+
+            UpdatePreview();
 
             alignPosition = TopHandler.Margin.Top + PreviewRect.ActualHeight / 2 - LeftHandler.ActualHeight / 2;
 
@@ -355,9 +359,7 @@ namespace WpfImageCutter
 
             PreviewRect.Width = RightHandler.Margin.Left - LeftHandler.Margin.Left + RightHandler.ActualWidth;
             PreviewRect.Height = BottomHandler.Margin.Top - TopHandler.Margin.Top + BottomHandler.ActualHeight;
-            PreviewRect.UpdateLayout();
-
-            PrecalculatePreviewRectBounds();
+            PreviewRect.UpdateLayout();            
 
             UpdateBackgroundDim();
         }
@@ -447,7 +449,8 @@ namespace WpfImageCutter
             position = Clamp(position, MinLeft, RightHandler.Margin.Left - RightHandler.ActualWidth);
 
             min = (maxWidth <= 0) ? MinLeft : RightHandler.Margin.Left - BorderSize - maxWidth;
-            position = Clamp(position, min, RightHandler.Margin.Left - BorderSize - minWidth);
+            max = RightHandler.Margin.Left - BorderSize - minWidth;
+            position = Clamp(position, min, max);
 
             LeftHandler.Margin = new Thickness(position, LeftHandler.Margin.Top, 0, 0);
             UpdateTopBottomMiddlePosition(alignPositions);
@@ -545,8 +548,7 @@ namespace WpfImageCutter
                     case "BottomHandler":
                         MoveBottomHandler(e.GetPosition(MainGrid).Y);
                         break;
-                }
-                UpdatePreview();
+                }                
             }
             else if (MoveAllHandlers)
             {

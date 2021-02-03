@@ -29,12 +29,22 @@ namespace TestWindow
 
         private void LoadImageBtn_Click(object sender, RoutedEventArgs e)
         {
-            Cutter.Source = ImageTools.GetBitmapImage(ImageTools.SearchImage());
+            Cutter.Source = ImageTools.GetBitmapImage(ImageTools.SearchImage());            
         }
 
         private void CutImageBtn_Click(object sender, RoutedEventArgs e)
         {
             ImageResult.Source = Cutter.CutImage();           
+        }
+
+        private void BlurBcgCb_Checked(object sender, RoutedEventArgs e)
+        {
+            Cutter.UseSourceAsBackground = true;
+        }
+
+        private void BlurBcgCb_Unchecked(object sender, RoutedEventArgs e)
+        {
+            Cutter.UseSourceAsBackground = false;
         }
     }
 }
