@@ -23,7 +23,11 @@ namespace WpfImageCutter
     {
         public ImageCutter()
         {
-            InitializeComponent();            
+            InitializeComponent();
+            for (int i = 0; i < 10; i++)
+            {
+                backgroundPoints.Add(new Point());
+            }
         }
 
         #region PrivateVariables
@@ -40,7 +44,11 @@ namespace WpfImageCutter
         //Allows the movement of all handlers
         private bool MoveAllHandlers = false;
 
-        private bool useSourceAsBackground = false;        
+        private bool useSourceAsBackground = false;
+
+        private double min, max, alignPosition;
+
+        PointCollection backgroundPoints = new PointCollection();        
         #endregion
 
         #region SourceProperty
@@ -313,10 +321,10 @@ namespace WpfImageCutter
                 return;
             }            
 
-            double position = LeftHandler.Margin.Left + PreviewRect.ActualWidth / 2 - TopHandler.ActualWidth / 2;
+            alignPosition = LeftHandler.Margin.Left + PreviewRect.ActualWidth / 2 - TopHandler.ActualWidth / 2;
 
-            TopHandler.Margin = new Thickness(position, TopHandler.Margin.Top, 0, 0);
-            BottomHandler.Margin = new Thickness(position, BottomHandler.Margin.Top, 0, 0);
+            TopHandler.Margin = new Thickness(alignPosition, TopHandler.Margin.Top, 0, 0);
+            BottomHandler.Margin = new Thickness(alignPosition, BottomHandler.Margin.Top, 0, 0);
         }
 
         /// <summary>
@@ -329,10 +337,10 @@ namespace WpfImageCutter
                 return;
             }            
 
-            double position = TopHandler.Margin.Top + PreviewRect.ActualHeight / 2 - LeftHandler.ActualHeight / 2;
+            alignPosition = TopHandler.Margin.Top + PreviewRect.ActualHeight / 2 - LeftHandler.ActualHeight / 2;
 
-            LeftHandler.Margin = new Thickness(LeftHandler.Margin.Left, position, 0, 0);
-            RightHandler.Margin = new Thickness(RightHandler.Margin.Left, position, 0, 0);
+            LeftHandler.Margin = new Thickness(LeftHandler.Margin.Left, alignPosition, 0, 0);
+            RightHandler.Margin = new Thickness(RightHandler.Margin.Left, alignPosition, 0, 0);
         }
 
         /// <summary>
@@ -353,21 +361,22 @@ namespace WpfImageCutter
         /// Updates the <see cref="PointCollection"/> of <see cref="BackgroundDim"/>
         /// </summary>
         private void UpdateBackgroundDim()
-        {
-            BackgroundDim.Points.Clear();
+        {                        
+            backgroundPoints[0] = new Point(MinLeft, MinTop);            
+            backgroundPoints[1] = new Point(MaxRight + RightHandler.ActualWidth, MinTop);
+            backgroundPoints[2] = new Point(MaxRight + RightHandler.ActualWidth, MaxBottom + BottomHandler.ActualHeight);
+            backgroundPoints[3] = new Point(MinLeft, MaxBottom + BottomHandler.ActualHeight);
 
-            BackgroundDim.Points.Add(new Point(MinLeft, MinTop));
-            BackgroundDim.Points.Add(new Point(MaxRight + RightHandler.ActualWidth, MinTop));
-            BackgroundDim.Points.Add(new Point(MaxRight + RightHandler.ActualWidth, MaxBottom + BottomHandler.ActualHeight));
-            BackgroundDim.Points.Add(new Point(MinLeft, MaxBottom + BottomHandler.ActualHeight));
+            backgroundPoints[4] = new Point(LeftHandler.Margin.Left, BottomHandler.Margin.Top);
+            backgroundPoints[5] = new Point(RightHandler.Margin.Left, BottomHandler.Margin.Top);
+            backgroundPoints[6] = new Point(RightHandler.Margin.Left, TopHandler.Margin.Top);
+            backgroundPoints[7] = new Point(LeftHandler.Margin.Left, TopHandler.Margin.Top);
 
-            BackgroundDim.Points.Add(new Point(LeftHandler.Margin.Left, BottomHandler.Margin.Top));
-            BackgroundDim.Points.Add(new Point(RightHandler.Margin.Left, BottomHandler.Margin.Top));
-            BackgroundDim.Points.Add(new Point(RightHandler.Margin.Left, TopHandler.Margin.Top));
-            BackgroundDim.Points.Add(new Point(LeftHandler.Margin.Left, TopHandler.Margin.Top));
-
-            BackgroundDim.Points.Add(new Point(LeftHandler.Margin.Left, BottomHandler.Margin.Top));
-            BackgroundDim.Points.Add(new Point(MinLeft, MaxBottom + BottomHandler.ActualHeight));
+            backgroundPoints[8] = new Point(LeftHandler.Margin.Left, BottomHandler.Margin.Top);
+            backgroundPoints[9] = new Point(MinLeft, MaxBottom + BottomHandler.ActualHeight);
+            
+            BackgroundDim.Points = backgroundPoints;
+            
         }
 
         /// <summary>
@@ -411,7 +420,7 @@ namespace WpfImageCutter
         {
             position = Clamp(position, MinLeft, RightHandler.Margin.Left - RightHandler.ActualWidth);
 
-            double min = (maxWidth <= 0) ? MinLeft : RightHandler.Margin.Left - BorderSize - maxWidth;
+            min = (maxWidth <= 0) ? MinLeft : RightHandler.Margin.Left - BorderSize - maxWidth;
             position = Clamp(position, min, RightHandler.Margin.Left - BorderSize - minWidth);
 
             LeftHandler.Margin = new Thickness(position, LeftHandler.Margin.Top, 0, 0);
@@ -426,8 +435,8 @@ namespace WpfImageCutter
         {
             position = Clamp(position, LeftHandler.Margin.Left + LeftHandler.ActualWidth, MaxRight);
 
-            double min = LeftHandler.Margin.Left + BorderSize + minWidth;
-            double max = (maxWidth <= 0) ? MaxRight : LeftHandler.Margin.Left + BorderSize + maxWidth;
+            min = LeftHandler.Margin.Left + BorderSize + minWidth;
+            max = (maxWidth <= 0) ? MaxRight : LeftHandler.Margin.Left + BorderSize + maxWidth;
             position = Clamp(position, min, max);
 
             RightHandler.Margin = new Thickness(position, RightHandler.Margin.Top, 0, 0);
@@ -442,8 +451,8 @@ namespace WpfImageCutter
         {
             position = Clamp(position, MinTop, BottomHandler.Margin.Top - BottomHandler.ActualHeight);
 
-            double min = (maxHeight <= 0) ? MinTop : BottomHandler.Margin.Top - BorderSize - maxHeight;
-            double max = BottomHandler.Margin.Top - BorderSize - minHeight;
+            min = (maxHeight <= 0) ? MinTop : BottomHandler.Margin.Top - BorderSize - maxHeight;
+            max = BottomHandler.Margin.Top - BorderSize - minHeight;
             position = Clamp(position, min, max);
 
             TopHandler.Margin = new Thickness(TopHandler.Margin.Left, position, 0, 0);
@@ -458,8 +467,8 @@ namespace WpfImageCutter
         {
             position = Clamp(position, TopHandler.Margin.Top + TopHandler.ActualHeight, MaxBottom);
 
-            double min = TopHandler.Margin.Top + BorderSize + minHeight;
-            double max = (maxHeight <= 0) ? MaxBottom : TopHandler.Margin.Top + BorderSize + maxHeight;
+            min = TopHandler.Margin.Top + BorderSize + minHeight;
+            max = (maxHeight <= 0) ? MaxBottom : TopHandler.Margin.Top + BorderSize + maxHeight;
             position = Clamp(position, min, max);
 
             BottomHandler.Margin = new Thickness(BottomHandler.Margin.Left, position, 0, 0);
