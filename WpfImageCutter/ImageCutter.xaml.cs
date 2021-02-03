@@ -23,7 +23,7 @@ namespace WpfImageCutter
     {
         public ImageCutter()
         {
-            InitializeComponent();
+            InitializeComponent();            
         }
 
         #region PrivateVariables
@@ -40,7 +40,7 @@ namespace WpfImageCutter
         //Allows the movement of all handlers
         private bool MoveAllHandlers = false;
 
-        private bool useSourceAsBackground = false;
+        private bool useSourceAsBackground = false;        
         #endregion
 
         #region SourceProperty
@@ -55,7 +55,7 @@ namespace WpfImageCutter
             set
             {
                 if (value != null)
-                {
+                {                    
                     ControlImage.Source = value;
 
                     if(useSourceAsBackground)
@@ -67,8 +67,7 @@ namespace WpfImageCutter
                     PixelHeight = ((BitmapSource)value).PixelHeight;
 
                     UpdateLayout();
-                    UpdateBounds();
-                    UpdateHandlersPosition();
+                    UpdateBounds();                    
                 }
             }
         }
@@ -291,21 +290,30 @@ namespace WpfImageCutter
         /// Moves the handlers position to its max
         /// </summary>
         private void UpdateHandlersPosition()
-        {
-            MoveLeftHandler(0, false);
-            MoveTopHandler(0, false);
-            MoveRightHandler(ActualWidth);
-            MoveBottomHandler(ActualHeight);
+        {            
+            LeftHandler.Margin = new Thickness(MinLeft, MinTop, 0, 0);
+            TopHandler.Margin = new Thickness(MinLeft, MinTop, 0, 0);
+
+            MoveRightHandler(ActualWidth, false);
+            MoveBottomHandler(ActualHeight, false);
 
             UpdatePreview();
+
+            UpdateTopBottomMiddlePosition();
+            UpdateLeftRightMiddlePosition();
         }
 
         /// <summary>
         /// Keeps the top and bottom handlers aligned at the center
         /// </summary>
-        private void UpdateTopBottomMiddlePosition()
+        private void UpdateTopBottomMiddlePosition(bool alignPositions = true)
         {
-            double position = LeftHandler.Margin.Left + (((RightHandler.Margin.Left + RightHandler.ActualWidth - LeftHandler.Margin.Left) / 2) - (TopHandler.ActualWidth / 2));
+            if (!alignPositions)
+            {
+                return;
+            }            
+
+            double position = LeftHandler.Margin.Left + PreviewRect.ActualWidth / 2 - TopHandler.ActualWidth / 2;
 
             TopHandler.Margin = new Thickness(position, TopHandler.Margin.Top, 0, 0);
             BottomHandler.Margin = new Thickness(position, BottomHandler.Margin.Top, 0, 0);
@@ -314,9 +322,14 @@ namespace WpfImageCutter
         /// <summary>
         /// Keeps the left and right handlers aligned at the center
         /// </summary>
-        private void UpdateLeftRightMiddlePosition()
-        {
-            double position = TopHandler.Margin.Top + (((BottomHandler.Margin.Top + BottomHandler.ActualHeight - TopHandler.Margin.Top) / 2) - (LeftHandler.ActualHeight / 2));
+        private void UpdateLeftRightMiddlePosition(bool alignPositions = true)
+        {            
+            if(!alignPositions)
+            {
+                return;
+            }            
+
+            double position = TopHandler.Margin.Top + PreviewRect.ActualHeight / 2 - LeftHandler.ActualHeight / 2;
 
             LeftHandler.Margin = new Thickness(LeftHandler.Margin.Left, position, 0, 0);
             RightHandler.Margin = new Thickness(RightHandler.Margin.Left, position, 0, 0);
@@ -328,8 +341,10 @@ namespace WpfImageCutter
         private void UpdatePreview()
         {
             PreviewRect.Margin = new Thickness(LeftHandler.Margin.Left, TopHandler.Margin.Top, 0, 0);
+
             PreviewRect.Width = RightHandler.Margin.Left - LeftHandler.Margin.Left + RightHandler.ActualWidth;
             PreviewRect.Height = BottomHandler.Margin.Top - TopHandler.Margin.Top + BottomHandler.ActualHeight;
+            PreviewRect.UpdateLayout();            
 
             UpdateBackgroundDim();
         }
@@ -391,80 +406,64 @@ namespace WpfImageCutter
         /// <summary>
         /// Moves the <see cref="LeftHandler"/> to a given position
         /// </summary>
-        /// <param name="position">Position from left to right</param>
-        /// <param name="enableRestrictions">If it is false, it will not take into account the restrictions given by the user</param>
-        private void MoveLeftHandler(double position, bool enableRestrictions = true)
+        /// <param name="position">Position from left to right</param>        
+        private void MoveLeftHandler(double position, bool alignPositions = true)
         {
             position = Clamp(position, MinLeft, RightHandler.Margin.Left - RightHandler.ActualWidth);
 
-            if(enableRestrictions)
-            {
-                double min = (maxWidth <= 0) ? MinLeft : RightHandler.Margin.Left - BorderSize - maxWidth;
-                position = Clamp(position, min, RightHandler.Margin.Left - BorderSize - minWidth);
-            }            
+            double min = (maxWidth <= 0) ? MinLeft : RightHandler.Margin.Left - BorderSize - maxWidth;
+            position = Clamp(position, min, RightHandler.Margin.Left - BorderSize - minWidth);
 
             LeftHandler.Margin = new Thickness(position, LeftHandler.Margin.Top, 0, 0);
-            UpdateTopBottomMiddlePosition();
+            UpdateTopBottomMiddlePosition(alignPositions);
         }
 
         /// <summary>
         /// Moves the <see cref="RightHandler"/> to a given position
         /// </summary>
-        /// <param name="position">Position from left to right</param>
-        /// <param name="enableRestrictions">If it is false, it will not take into account the restrictions given by the user</param>
-        private void MoveRightHandler(double position, bool enableRestrictions = true)
+        /// <param name="position">Position from left to right</param>        
+        private void MoveRightHandler(double position, bool alignPositions = true)
         {
             position = Clamp(position, LeftHandler.Margin.Left + LeftHandler.ActualWidth, MaxRight);
 
-            if (enableRestrictions)
-            {
-                double min = LeftHandler.Margin.Left + BorderSize + minWidth;
-                double max = (maxWidth <= 0) ? MaxRight : LeftHandler.Margin.Left + BorderSize + maxWidth;
-                position = Clamp(position, min, max);
-            }
+            double min = LeftHandler.Margin.Left + BorderSize + minWidth;
+            double max = (maxWidth <= 0) ? MaxRight : LeftHandler.Margin.Left + BorderSize + maxWidth;
+            position = Clamp(position, min, max);
 
             RightHandler.Margin = new Thickness(position, RightHandler.Margin.Top, 0, 0);
-            UpdateTopBottomMiddlePosition();
+            UpdateTopBottomMiddlePosition(alignPositions);
         }
 
         /// <summary>
         /// Moves the <see cref="TopHandler"/> to a given position
         /// </summary>
-        /// <param name="position">Position from top to bottom</param>
-        /// <param name="enableRestrictions">If it is false, it will not take into account the restrictions given by the user</param>
-        private void MoveTopHandler(double position, bool enableRestrictions = true)
+        /// <param name="position">Position from top to bottom</param>        
+        private void MoveTopHandler(double position, bool alignPositions = true)
         {
             position = Clamp(position, MinTop, BottomHandler.Margin.Top - BottomHandler.ActualHeight);
 
-            if (enableRestrictions)
-            {
-                double min = (maxHeight <= 0) ? MinTop : BottomHandler.Margin.Top - BorderSize - maxHeight;
-                double max = BottomHandler.Margin.Top - BorderSize - minHeight;
-                position = Clamp(position, min, max);
-            }
+            double min = (maxHeight <= 0) ? MinTop : BottomHandler.Margin.Top - BorderSize - maxHeight;
+            double max = BottomHandler.Margin.Top - BorderSize - minHeight;
+            position = Clamp(position, min, max);
 
             TopHandler.Margin = new Thickness(TopHandler.Margin.Left, position, 0, 0);
-            UpdateLeftRightMiddlePosition();
+            UpdateLeftRightMiddlePosition(alignPositions);
         }
 
         /// <summary>
         /// Moves the <see cref="BottomHandler"/> to a given position
         /// </summary>
-        /// <param name="position">Position from top to bottom</param>
-        /// <param name="enableRestrictions">If it is false, it will not take into account the restrictions given by the user</param>
-        private void MoveBottomHandler(double position, bool enableRestrictions = true)
+        /// <param name="position">Position from top to bottom</param>        
+        private void MoveBottomHandler(double position, bool alignPositions = true)
         {
             position = Clamp(position, TopHandler.Margin.Top + TopHandler.ActualHeight, MaxBottom);
 
-            if (enableRestrictions)
-            {
-                double min = TopHandler.Margin.Top + BorderSize + minHeight;
-                double max = (maxHeight <= 0) ? MaxBottom : TopHandler.Margin.Top + BorderSize + maxHeight;
-                position = Clamp(position, min, max);
-            }
+            double min = TopHandler.Margin.Top + BorderSize + minHeight;
+            double max = (maxHeight <= 0) ? MaxBottom : TopHandler.Margin.Top + BorderSize + maxHeight;
+            position = Clamp(position, min, max);
 
             BottomHandler.Margin = new Thickness(BottomHandler.Margin.Left, position, 0, 0);
-            UpdateLeftRightMiddlePosition();
+            UpdateLeftRightMiddlePosition(alignPositions);
         }
 
         /// <summary>
@@ -486,7 +485,10 @@ namespace WpfImageCutter
             MoveRightHandler(PreviewRect.Margin.Left + PreviewRect.ActualWidth - RightHandler.ActualWidth, false);
             MoveBottomHandler(PreviewRect.Margin.Top + PreviewRect.ActualHeight - BottomHandler.ActualHeight, false);
 
-            UpdatePreview();
+            UpdateTopBottomMiddlePosition();
+            UpdateLeftRightMiddlePosition();
+            
+            UpdateBackgroundDim();
         }
 
         /// <summary>
@@ -494,7 +496,7 @@ namespace WpfImageCutter
         /// </summary>
         /// <param name="sender"><see cref="Rectangle"/> Handler</param>        
         private void MainGrid_MouseMove(object sender, MouseEventArgs e)
-        {
+        {            
             if (ActiveHandler != null)
             {
                 switch (ActiveHandler.Name)
@@ -526,17 +528,12 @@ namespace WpfImageCutter
         private void MainControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             UpdateBounds();
-            UpdateHandlersPosition();
-            UpdateTopBottomMiddlePosition();
-            UpdateLeftRightMiddlePosition();
         }
 
         //Updates the bounds when the control is loaded
         private void MainControl_Loaded(object sender, RoutedEventArgs e)
         {
-            UpdateBounds();                       
-            UpdateTopBottomMiddlePosition();
-            UpdateLeftRightMiddlePosition();
+            UpdateBounds();
         }
 
         //Sets the ActiveHandler to null
