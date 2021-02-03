@@ -24,6 +24,7 @@ namespace WpfImageCutter
         public ImageCutter()
         {
             InitializeComponent();
+
             for (int i = 0; i < 10; i++)
             {
                 backgroundPoints.Add(new Point());
@@ -43,11 +44,13 @@ namespace WpfImageCutter
         private Rectangle ActiveHandler;
         //Allows the movement of all handlers
         private bool MoveAllHandlers = false;
-
+        //Allows the use of the source as blur background
         private bool useSourceAsBackground = false;
-
+        //Min and Max value to move a handler
         private double min, max, alignPosition;
-
+        //Precalculated values used when all handlers are moved at once
+        private double PreviewMaxRight, PreviewMaxBottom, PreviewHalfWidth, PreviewHalfHeight, PreviewLeft, PreviewTop;
+        //BackgroundDim points
         PointCollection backgroundPoints = new PointCollection();        
         #endregion
 
@@ -352,7 +355,9 @@ namespace WpfImageCutter
 
             PreviewRect.Width = RightHandler.Margin.Left - LeftHandler.Margin.Left + RightHandler.ActualWidth;
             PreviewRect.Height = BottomHandler.Margin.Top - TopHandler.Margin.Top + BottomHandler.ActualHeight;
-            PreviewRect.UpdateLayout();            
+            PreviewRect.UpdateLayout();
+
+            PrecalculatePreviewRectBounds();
 
             UpdateBackgroundDim();
         }
@@ -361,22 +366,24 @@ namespace WpfImageCutter
         /// Updates the <see cref="PointCollection"/> of <see cref="BackgroundDim"/>
         /// </summary>
         private void UpdateBackgroundDim()
-        {                        
-            backgroundPoints[0] = new Point(MinLeft, MinTop);            
-            backgroundPoints[1] = new Point(MaxRight + RightHandler.ActualWidth, MinTop);
-            backgroundPoints[2] = new Point(MaxRight + RightHandler.ActualWidth, MaxBottom + BottomHandler.ActualHeight);
-            backgroundPoints[3] = new Point(MinLeft, MaxBottom + BottomHandler.ActualHeight);
-
-            backgroundPoints[4] = new Point(LeftHandler.Margin.Left, BottomHandler.Margin.Top);
-            backgroundPoints[5] = new Point(RightHandler.Margin.Left, BottomHandler.Margin.Top);
-            backgroundPoints[6] = new Point(RightHandler.Margin.Left, TopHandler.Margin.Top);
-            backgroundPoints[7] = new Point(LeftHandler.Margin.Left, TopHandler.Margin.Top);
-
-            backgroundPoints[8] = new Point(LeftHandler.Margin.Left, BottomHandler.Margin.Top);
-            backgroundPoints[9] = new Point(MinLeft, MaxBottom + BottomHandler.ActualHeight);
+        {            
+            //bounds
+            backgroundPoints[0] = UpdatePoint(backgroundPoints[0], MinLeft, MinTop);            
+            backgroundPoints[1] = UpdatePoint(backgroundPoints[1], MaxRight + RightHandler.ActualWidth, MinTop);            
+            backgroundPoints[2] = UpdatePoint(backgroundPoints[2], MaxRight + RightHandler.ActualWidth, MaxBottom + BottomHandler.ActualHeight);            
+            backgroundPoints[3] = UpdatePoint(backgroundPoints[3], MinLeft, MaxBottom + BottomHandler.ActualHeight);
             
+            //cutter
+            backgroundPoints[4] = UpdatePoint(backgroundPoints[4], LeftHandler.Margin.Left, BottomHandler.Margin.Top);            
+            backgroundPoints[5] = UpdatePoint(backgroundPoints[5], RightHandler.Margin.Left, BottomHandler.Margin.Top);            
+            backgroundPoints[6] = UpdatePoint(backgroundPoints[6], RightHandler.Margin.Left, TopHandler.Margin.Top);            
+            backgroundPoints[7] = UpdatePoint(backgroundPoints[7], LeftHandler.Margin.Left, TopHandler.Margin.Top);
+            
+            //join
+            backgroundPoints[8] = UpdatePoint(backgroundPoints[8], LeftHandler.Margin.Left, BottomHandler.Margin.Top);
+            backgroundPoints[9] = UpdatePoint(backgroundPoints[9], MinLeft, MaxBottom + BottomHandler.ActualHeight);
+
             BackgroundDim.Points = backgroundPoints;
-            
         }
 
         /// <summary>
@@ -397,6 +404,14 @@ namespace WpfImageCutter
         {
             BackgroundImage.Source = Source;
         }
+
+        private Point UpdatePoint(Point p, double x, double y)
+        {
+            p.X = x;
+            p.Y = y;
+
+            return p;
+        }
         #endregion
 
         #region Grab/Release
@@ -408,6 +423,17 @@ namespace WpfImageCutter
         private void ReleaseHandler(object sender, MouseButtonEventArgs e)
         {
             ActiveHandler = null;
+
+            PrecalculatePreviewRectBounds();
+        }
+
+        private void PrecalculatePreviewRectBounds()
+        {
+            PreviewMaxRight = MaxRight - PreviewRect.ActualWidth + RightHandler.ActualWidth;
+            PreviewMaxBottom = MaxBottom - PreviewRect.ActualHeight + BottomHandler.ActualHeight;
+
+            PreviewHalfWidth = PreviewRect.ActualWidth / 2;
+            PreviewHalfHeight = PreviewRect.ActualHeight / 2;
         }
         #endregion
 
@@ -480,14 +506,11 @@ namespace WpfImageCutter
         /// </summary>
         /// <param name="position">Central <see cref="Point"/></param>
         private void MoveHandlers(Point position)
-        {
-            //bounds
-            double maxright, maxbottom;
-            
-            maxright = Clamp(position.X - PreviewRect.ActualWidth / 2, MinLeft, MaxRight - PreviewRect.ActualWidth + RightHandler.ActualWidth);
-            maxbottom = Clamp(position.Y - PreviewRect.ActualHeight / 2, MinTop, MaxBottom - PreviewRect.ActualHeight + BottomHandler.ActualHeight);
+        {            
+            PreviewLeft = Clamp(position.X - PreviewHalfWidth, MinLeft, PreviewMaxRight);
+            PreviewTop = Clamp(position.Y - PreviewHalfHeight, MinTop, PreviewMaxBottom);
 
-            PreviewRect.Margin = new Thickness(maxright, maxbottom, 0, 0);
+            PreviewRect.Margin = new Thickness(PreviewLeft, PreviewTop, 0, 0);
 
             MoveLeftHandler(PreviewRect.Margin.Left, false);
             MoveTopHandler(PreviewRect.Margin.Top, false);
@@ -618,6 +641,6 @@ namespace WpfImageCutter
                 return null;
             }            
         }
-        #endregion              
+        #endregion
     }
 }
