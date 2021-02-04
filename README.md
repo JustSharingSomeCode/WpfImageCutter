@@ -7,3 +7,4 @@ A user control that allows you to crop images
 The use of BlurBackground affects performance
 
 <img src="TestWindow/Images/Pic3.PNG">
+<img src="TestWindow/Images/Pic4.PNG">
