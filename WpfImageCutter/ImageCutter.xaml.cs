@@ -272,7 +272,7 @@ namespace WpfImageCutter
                 useSourceAsBackground = value;
 
                 if (useSourceAsBackground)
-                {
+                {                    
                     UpdateBackgroundImage();
                 }
                 else
@@ -430,7 +430,7 @@ namespace WpfImageCutter
         }
 
         private void PrecalculatePreviewRectBounds()
-        {
+        {            
             PreviewMaxRight = MaxRight - PreviewRect.ActualWidth + RightHandler.ActualWidth;
             PreviewMaxBottom = MaxBottom - PreviewRect.ActualHeight + BottomHandler.ActualHeight;
 
@@ -574,18 +574,21 @@ namespace WpfImageCutter
         private void MainGrid_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             ActiveHandler = null;
+            PrecalculatePreviewRectBounds();
         }
 
         //Sets the ActiveHandler to null
         private void MainControl_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             ActiveHandler = null;
+            PrecalculatePreviewRectBounds();
         }
 
         //Sets the ActiveHandler to null
         private void MainControl_MouseLeave(object sender, MouseEventArgs e)
         {
             ActiveHandler = null;
+            PrecalculatePreviewRectBounds();
         }
 
         //Enables the movement of all handlers

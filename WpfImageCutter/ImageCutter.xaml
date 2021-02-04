@@ -9,7 +9,7 @@
     <Grid x:Name="MainGrid" MouseMove="MainGrid_MouseMove" MouseLeftButtonUp="MainGrid_MouseLeftButtonUp">
         <Image x:Name="BackgroundImage" Stretch="UniformToFill" Opacity="0.5" Margin="-10">
             <Image.Effect>
-                <BlurEffect RenderingBias="Quality" Radius="30"/>
+                <BlurEffect Radius="10"/>
             </Image.Effect>
         </Image>
         <Image x:Name="ControlImage"/>
