@@ -12,8 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-
-using WpfImageTools;
+using WpfImageCutter;
 
 namespace TestWindow
 {
@@ -29,7 +28,7 @@ namespace TestWindow
 
         private void LoadImageBtn_Click(object sender, RoutedEventArgs e)
         {
-            Cutter.Source = ImageTools.GetBitmapImage(ImageTools.SearchImage());            
+            Cutter.Source = WpfImageTools.GetBitmapImage(WpfImageTools.SearchImage());            
         }
 
         private void CutImageBtn_Click(object sender, RoutedEventArgs e)
